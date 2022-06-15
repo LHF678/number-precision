@@ -1,0 +1,31 @@
+{
+  "name": "number-precision",
+  "version": "1.0.0",
+  "description": "处理 number 精度工具函数",
+  "main": "index.js",
+  "scripts": {
+    "watch": "rollup -w -c",
+    "build": "rollup -c ",
+    "lint": "eslint 'src/**/*.{js,ts}'"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-alloy": "^4.5.1",
+    "husky": "^4.3.6",
+    "rollup": "^2.75.6",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "typescript": "^4.7.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+    }
+  }
+}
