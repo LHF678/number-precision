@@ -1,5 +1,12 @@
 {
     "compilerOptions": {
+        "lib": [
+          "dom",
+          "es5",
+          "es6"
+        ],
+        "strict": true, // 开启严格模式
+        "declaration": true, // 生成 .d.ts 声明文件
         "target": "es5",
         "rootDir": "./src",
     },

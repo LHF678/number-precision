@@ -9,7 +9,17 @@
 <body>
   <script src="./build/index.iife.js"></script>
   <script>
-    console.log(NP.add(1,2))
+    // console.log()
+    NP.plus(3.2423444423534564e+39,2)
+    NP.plus(3.2423444423534564e+39,2)
+
+    const source = 0.000000132330004
+    console.log('原数字', source)
+    const trsf = NP.toNonExponential(source);
+    console.log('转换后', trsf)
+
+    const qff = NP.thousandSeparator(1324232423)
+    console.log(qff)
   </script>
 </body>
 </html>
