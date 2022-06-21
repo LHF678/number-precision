@@ -26,6 +26,16 @@
     // 多个值相加
     const plus2 = NP.plus(0.1, 0.2, 0.3, 0.4)
     console.log('plus', plus2)
+
+    // 精确乘法
+    const times1 = NP.times(0.00000001, 10)
+    console.log(times1, '0.00000001 * 10')
+    console.log(NP.toNonExponential(times1), '；0.00000001 * 10 科学计数法转换')
+    const times2 = NP.times(0.1, 0.2)
+    console.log(times2, '0.1 * 0.2')
+    const times3 = NP.times(20, 10)
+    console.log(times3, '20 * 10')
+
   </script>
 </body>
 </html>

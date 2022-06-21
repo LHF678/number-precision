@@ -7,6 +7,8 @@
  * @method thousandSeparator 格式化千分位符
  */
 
+const _E = /[eE]-/;
+
 /**
  * @description 检测数字是否越界，如果越界给出提示
  * @param {number} num 输入数
@@ -33,6 +35,16 @@ const _iteratorOperation = (arr: number[], operation: (...arges: number[]) => nu
   return result;
 };
 
+/**
+ * @description 把错误的数据转正
+ * strip(0.09999999999999998)=0.1
+ * fix: 类似 10 ** -4 为 0.00009999999999999999，strip 修正
+ */
+const strip = (num: number, precision = 15): number => {
+  return +parseFloat(Number(num).toPrecision(precision));
+};
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 /**
@@ -56,19 +68,6 @@ export const thousandSeparator = (num: number): string => {
 };
 
 /**
- * @description 处理针对小数的科学计数法
- * @param {number} num 参数
- * @return {string}
- */
-export const toNonExponential = (num: number): string => {
-  // 获取小数后位数
-  const digits = digitLength(num);
-  // 通过 toFixed 转换
-  return num.toFixed(digits);
-};
-
-
-/**
  * @description 返回数字的位数长度，支持获取超出位数的科学计数法位数如 0.00000033浏览器表现：3.3e-7 返回 8
  * @param {number} num
  */
@@ -87,10 +86,36 @@ export const digitLength = (num: number): number => {
   return Math.max(0, $n1.length - $n2);
 };
 
+/**
+ * @description 处理针对小数的科学计数法
+ * @param {number} num 参数
+ * @return {string}
+ */
+export const toNonExponential = (num: number): string => {
+  // 获取小数后位数
+  const digits = digitLength(num);
+  // 通过 toFixed 转换
+  return num.toFixed(digits);
+};
+
+/**
+ * @description 把小数转成整数，支持科学计数法比如（0.0000001）。如果是小数则放大成整数
+ * @param {*number} num 输入数
+ */
+export const float2Fixed = (num: number): number => {
+  const num_str = num.toString();
+  // 存在科学计数法
+  if (_E.test(num_str)) {
+    const len = digitLength(num);
+    return num * Math.pow(10, len);
+  }
+
+  return Number(num_str.replace('.', ''));
+};
 
 /**
  * @description 精确加法，将所有数字升位转化为整型了再做计算，计算完毕后再将最终结果进行相应的降位处理
- * @param {number} num
+ * @param {number} nums
  * @return {number}
  */
 export const plus = (...nums: number[]): number => {
@@ -100,9 +125,30 @@ export const plus = (...nums: number[]): number => {
   const [num1, num2] = nums;
   // 取最大的小数位
   const maxLength = Math.max(digitLength(num1), digitLength(num2));
-  // 取得基数
+  // 取得基数 -> 用于将小数全部转为整数
   const baseNum = Math.pow(10, maxLength);
   // 通过基数转化为整型计算，再降位处理
   const result = (num1 * baseNum + num2 * baseNum) / baseNum;
   return result;
+};
+
+/**
+ * @description 精确乘法 思路与加法一至
+ *  eg: 0.1 * 0.2
+ *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
+ *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
+ *    3、降级处理获得最终结果 2 / 100 = 0.02
+ * @param {number} nums
+ * @return {number}
+ */
+export const times = (...nums: number[]): number => {
+  const [num1, num2] = nums;
+  const num1Changed = float2Fixed(num1);
+  const num2Changed = float2Fixed(num2);
+  const baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
+  const leftValue = num1Changed * num2Changed;
+
+  _checkBoundary(leftValue);
+
+  return leftValue / baseNum;
 };
