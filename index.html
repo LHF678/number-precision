@@ -9,10 +9,6 @@
 <body>
   <script src="./build/index.iife.js"></script>
   <script>
-    // console.log()
-    NP.plus(3.2423444423534564e+39,2)
-    NP.plus(3.2423444423534564e+39,2)
-
     const source = 0.000000132330004
     console.log('原数字', source)
     const trsf = NP.toNonExponential(source);
@@ -20,6 +16,16 @@
 
     const qff = NP.thousandSeparator(1324232423)
     console.log(qff)
+
+    const plus = NP.plus(0.0000001, 0.0000002)
+    console.log('plus', plus)
+
+    const plus1 = NP.plus(3.232, 43.343)
+    console.log('plus', plus1)
+
+    // 多个值相加
+    const plus2 = NP.plus(0.1, 0.2, 0.3, 0.4)
+    console.log('plus', plus2)
   </script>
 </body>
 </html>
