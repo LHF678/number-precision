@@ -35,16 +35,6 @@ const _iteratorOperation = (arr: number[], operation: (...arges: number[]) => nu
   return result;
 };
 
-/**
- * @description 把错误的数据转正
- * strip(0.09999999999999998)=0.1
- * fix: 类似 10 ** -4 为 0.00009999999999999999，strip 修正
- */
-const strip = (num: number, precision = 15): number => {
-  return +parseFloat(Number(num).toPrecision(precision));
-};
-
-
 // -----------------------------------------------------------------------------------------------------------
 
 /**
@@ -54,6 +44,17 @@ const strip = (num: number, precision = 15): number => {
 let _boundaryCheckingState = true;
 export const enableBoundaryChecking = (flag = true):void => {
   _boundaryCheckingState = flag;
+};
+
+/**
+ * @description 把错误的数据转正
+ * @param {number} num
+ * @param {number} precision 精度默认 15
+ * strip(0.09999999999999998)=0.1
+ * fix: 类似 10 ** -4 为 0.00009999999999999999，0.00001 * 10000000000000000000 为 100000000000000.02 strip 修正
+ */
+export const strip = (num: number, precision = 15): number => {
+  return +parseFloat(num.toPrecision(precision));
 };
 
 /**
@@ -107,10 +108,34 @@ export const float2Fixed = (num: number): number => {
   // 存在科学计数法
   if (_E.test(num_str)) {
     const len = digitLength(num);
-    return num * Math.pow(10, len);
+    return strip(num * Math.pow(10, len));
   }
 
   return Number(num_str.replace('.', ''));
+};
+
+/**
+ * @description 精确乘法 思路与加法一至
+ *  eg: 0.1 * 0.2
+ *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
+ *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
+ *    3、降级处理获得最终结果 2 / 100 = 0.02
+ * @param {number} nums
+ * @return {number}
+ */
+export const times = (...nums: number[]): number => {
+  if (nums.length > 2) {
+    return _iteratorOperation(nums, times);
+  }
+  const [num1, num2] = nums;
+  const num1Changed = float2Fixed(num1);
+  const num2Changed = float2Fixed(num2);
+  const baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
+  const leftValue = num1Changed * num2Changed;
+
+  _checkBoundary(leftValue);
+
+  return leftValue / baseNum;
 };
 
 /**
@@ -128,27 +153,7 @@ export const plus = (...nums: number[]): number => {
   // 取得基数 -> 用于将小数全部转为整数
   const baseNum = Math.pow(10, maxLength);
   // 通过基数转化为整型计算，再降位处理
-  const result = (num1 * baseNum + num2 * baseNum) / baseNum;
+  const result = (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
   return result;
 };
 
-/**
- * @description 精确乘法 思路与加法一至
- *  eg: 0.1 * 0.2
- *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
- *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
- *    3、降级处理获得最终结果 2 / 100 = 0.02
- * @param {number} nums
- * @return {number}
- */
-export const times = (...nums: number[]): number => {
-  const [num1, num2] = nums;
-  const num1Changed = float2Fixed(num1);
-  const num2Changed = float2Fixed(num2);
-  const baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
-  const leftValue = num1Changed * num2Changed;
-
-  _checkBoundary(leftValue);
-
-  return leftValue / baseNum;
-};

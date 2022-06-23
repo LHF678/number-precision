@@ -40,6 +40,17 @@ var enableBoundaryChecking = function (flag) {
     _boundaryCheckingState = flag;
 };
 /**
+ * @description 把错误的数据转正
+ * @param {number} num
+ * @param {number} precision 精度默认 15
+ * strip(0.09999999999999998)=0.1
+ * fix: 类似 10 ** -4 为 0.00009999999999999999，0.00001 * 10000000000000000000 为 100000000000000.02 strip 修正
+ */
+var strip = function (num, precision) {
+    if (precision === void 0) { precision = 15; }
+    return +parseFloat(num.toPrecision(precision));
+};
+/**
  * @description 格式化千分位符
  * @param {number} num 参数
  * @return {string} 1,324,232,423
@@ -87,9 +98,34 @@ var float2Fixed = function (num) {
     // 存在科学计数法
     if (_E.test(num_str)) {
         var len = digitLength(num);
-        return num * Math.pow(10, len);
+        return strip(num * Math.pow(10, len));
     }
     return Number(num_str.replace('.', ''));
+};
+/**
+ * @description 精确乘法 思路与加法一至
+ *  eg: 0.1 * 0.2
+ *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
+ *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
+ *    3、降级处理获得最终结果 2 / 100 = 0.02
+ * @param {number} nums
+ * @return {number}
+ */
+var times = function () {
+    var nums = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        nums[_i] = arguments[_i];
+    }
+    if (nums.length > 2) {
+        return _iteratorOperation(nums, times);
+    }
+    var num1 = nums[0], num2 = nums[1];
+    var num1Changed = float2Fixed(num1);
+    var num2Changed = float2Fixed(num2);
+    var baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
+    var leftValue = num1Changed * num2Changed;
+    _checkBoundary(leftValue);
+    return leftValue / baseNum;
 };
 /**
  * @description 精确加法，将所有数字升位转化为整型了再做计算，计算完毕后再将最终结果进行相应的降位处理
@@ -110,30 +146,8 @@ var plus = function () {
     // 取得基数 -> 用于将小数全部转为整数
     var baseNum = Math.pow(10, maxLength);
     // 通过基数转化为整型计算，再降位处理
-    var result = (num1 * baseNum + num2 * baseNum) / baseNum;
+    var result = (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
     return result;
 };
-/**
- * @description 精确乘法 思路与加法一至
- *  eg: 0.1 * 0.2
- *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
- *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
- *    3、降级处理获得最终结果 2 / 100 = 0.02
- * @param {number} nums
- * @return {number}
- */
-var times = function () {
-    var nums = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        nums[_i] = arguments[_i];
-    }
-    var num1 = nums[0], num2 = nums[1];
-    var num1Changed = float2Fixed(num1);
-    var num2Changed = float2Fixed(num2);
-    var baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
-    var leftValue = num1Changed * num2Changed;
-    _checkBoundary(leftValue);
-    return leftValue / baseNum;
-};
 
-export { digitLength, enableBoundaryChecking, float2Fixed, plus, thousandSeparator, times, toNonExponential };
+export { digitLength, enableBoundaryChecking, float2Fixed, plus, strip, thousandSeparator, times, toNonExponential };

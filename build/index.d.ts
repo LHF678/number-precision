@@ -8,6 +8,14 @@
  */
 export declare const enableBoundaryChecking: (flag?: boolean) => void;
 /**
+ * @description 把错误的数据转正
+ * @param {number} num
+ * @param {number} precision 精度默认 15
+ * strip(0.09999999999999998)=0.1
+ * fix: 类似 10 ** -4 为 0.00009999999999999999，0.00001 * 10000000000000000000 为 100000000000000.02 strip 修正
+ */
+export declare const strip: (num: number, precision?: number) => number;
+/**
  * @description 格式化千分位符
  * @param {number} num 参数
  * @return {string} 1,324,232,423
@@ -30,12 +38,6 @@ export declare const toNonExponential: (num: number) => string;
  */
 export declare const float2Fixed: (num: number) => number;
 /**
- * @description 精确加法，将所有数字升位转化为整型了再做计算，计算完毕后再将最终结果进行相应的降位处理
- * @param {number} nums
- * @return {number}
- */
-export declare const plus: (...nums: number[]) => number;
-/**
  * @description 精确乘法 思路与加法一至
  *  eg: 0.1 * 0.2
  *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
@@ -45,3 +47,9 @@ export declare const plus: (...nums: number[]) => number;
  * @return {number}
  */
 export declare const times: (...nums: number[]) => number;
+/**
+ * @description 精确加法，将所有数字升位转化为整型了再做计算，计算完毕后再将最终结果进行相应的降位处理
+ * @param {number} nums
+ * @return {number}
+ */
+export declare const plus: (...nums: number[]) => number;
