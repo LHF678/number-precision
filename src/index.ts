@@ -150,10 +150,28 @@ export const plus = (...nums: number[]): number => {
   const [num1, num2] = nums;
   // 取最大的小数位
   const maxLength = Math.max(digitLength(num1), digitLength(num2));
-  // 取得基数 -> 用于将小数全部转为整数
+  // 取得基数 -> 转化为整型
   const baseNum = Math.pow(10, maxLength);
   // 通过基数转化为整型计算，再降位处理
   const result = (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
   return result;
 };
 
+/**
+ * @description 精确减法 思路同精确加只是换成了减运算
+ * @param {number} nums
+ * @return {number}
+ */
+export const minus = (...nums: number[]): number => {
+  if (nums.length > 2) {
+    return _iteratorOperation(nums, minus);
+  }
+  const [num1, num2] = nums;
+  // 取最大的小数位
+  const maxLength = Math.max(digitLength(num1), digitLength(num2));
+  // 取得基数 -> 转化为整型
+  const baseNum = Math.pow(10, maxLength);
+  // 通过基数转化为整型计算，再降位处理
+  const result = (times(num1, baseNum) - times(num2, baseNum)) / baseNum;
+  return result;
+};

@@ -53,3 +53,9 @@ export declare const times: (...nums: number[]) => number;
  * @return {number}
  */
 export declare const plus: (...nums: number[]) => number;
+/**
+ * @description 精确减法 思路同精确加只是换成了减运算
+ * @param {number} nums
+ * @return {number}
+ */
+export declare const minus: (...nums: number[]) => number;

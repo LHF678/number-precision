@@ -9,33 +9,37 @@
 <body>
   <script src="./build/index.iife.js"></script>
   <script>
-    const source = 0.000000132330004
-    console.log('原数字', source)
-    const trsf = NP.toNonExponential(source);
-    console.log('转换后', trsf)
 
-    const qff = NP.thousandSeparator(1324232423)
-    console.log(qff)
+    const testConfig = {
+      '处理针对小数的科学计数法': {
+        '原数字': { value: 0.000000132330004 },
+        '转换后': { value: NP.toNonExponential(0.000000132330004) }
+      },
+      '千分符': {
+        '原数字': { value: 3434534543545 },
+        '转换后': { value: NP.thousandSeparator(3434534543545) }
+      },
+      '精确加': {
+        '两数相加 0.1 + 0.2': { '原始加': 0.1 + 0.2, 'NP.plus':  NP.plus(0.1, 0.2) },
+        '多数相加 0.1 + 0.2 + 0.3': { '原始加': 0.1 + 0.2 + 0.3, 'NP.plus':  NP.plus(0.1, 0.2, 0.3) },
+      },
+      '精确乘': {
+        '两数相乘 0.1 * 0.2': { '原始乘': 0.1 * 0.2, 'NP.times':  NP.times(0.1, 0.2) },
+        '两数相乘 0.000001 * 10': { '原始乘': 0.000001 * 10, 'NP.times':  NP.times(0.000001, 10) },
+        '多数相乘 0.1 * 0.2 * 0.3': { '原始乘': 0.1 * 0.2 * 0.3, 'NP.times':  NP.times(0.1, 0.2, 0.3) },
+        '多数相乘 5 * 2 * 9': { '原始乘': 5 * 2 * 9, 'NP.times':  NP.times(5, 2, 9) },
+      },
+      '精确减': {
+        '两数相减 0.3 - 0.1': { '原始减': 0.3 - 0.1, 'NP.minus': NP.minus(0.3, 0.1) },
+        '多数相减 0.9 - 0.5 - 0.1': { '原始减': 0.9 - 0.5 - 0.1, 'NP.minus': NP.minus(0.9, 0.5, 0.1) }
+      },
+    }
 
-    const plus = NP.plus(0.0000001, 0.0000002)
-    console.log('plus', plus)
-
-    const plus1 = NP.plus(3.232, 43.343)
-    console.log('plus', plus1)
-
-    // 多个值相加
-    const plus2 = NP.plus(0.1, 0.2, 0.3, 0.4)
-    console.log('plus', plus2)
-
-    // 精确乘法
-    const times1 = NP.times(0.00000001, 10)
-    console.log(times1, '0.00000001 * 10')
-    console.log(NP.toNonExponential(times1), '；0.00000001 * 10 科学计数法转换')
-    const times2 = NP.times(0.1, 0.2)
-    console.log(times2, '0.1 * 0.2')
-    const times3 = NP.times(20, 10)
-    console.log(times3, '20 * 10')
-
+    for (let key in testConfig) {
+      const table = testConfig[key]
+      console.log(`--------------------${key}-------------------------`)
+      console.table(table)
+    }
   </script>
 </body>
 </html>

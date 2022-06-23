@@ -149,16 +149,39 @@
       var num1 = nums[0], num2 = nums[1];
       // 取最大的小数位
       var maxLength = Math.max(digitLength(num1), digitLength(num2));
-      // 取得基数 -> 用于将小数全部转为整数
+      // 取得基数 -> 转化为整型
       var baseNum = Math.pow(10, maxLength);
       // 通过基数转化为整型计算，再降位处理
       var result = (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
+      return result;
+  };
+  /**
+   * @description 精确减法 思路同精确加只是换成了减运算
+   * @param {number} nums
+   * @return {number}
+   */
+  var minus = function () {
+      var nums = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+          nums[_i] = arguments[_i];
+      }
+      if (nums.length > 2) {
+          return _iteratorOperation(nums, minus);
+      }
+      var num1 = nums[0], num2 = nums[1];
+      // 取最大的小数位
+      var maxLength = Math.max(digitLength(num1), digitLength(num2));
+      // 取得基数 -> 转化为整型
+      var baseNum = Math.pow(10, maxLength);
+      // 通过基数转化为整型计算，再降位处理
+      var result = (times(num1, baseNum) - times(num2, baseNum)) / baseNum;
       return result;
   };
 
   exports.digitLength = digitLength;
   exports.enableBoundaryChecking = enableBoundaryChecking;
   exports.float2Fixed = float2Fixed;
+  exports.minus = minus;
   exports.plus = plus;
   exports.strip = strip;
   exports.thousandSeparator = thousandSeparator;
