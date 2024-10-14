@@ -1,35 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
   <script src="./build/index.iife.js"></script>
   <script>
 
     const testConfig = {
-      '处理针对小数的科学计数法': {
+      '处理小数的科学计数法 toNonExponential': {
         '原数字': { value: 0.000000132330004 },
         '转换后': { value: NP.toNonExponential(0.000000132330004) }
       },
-      '千分符': {
+      '千分符 thousandSeparator': {
         '原数字': { value: 3434534543545 },
         '转换后': { value: NP.thousandSeparator(3434534543545) }
       },
-      '精确加': {
+      '把错误的数值修正 strip': {
+        '10 ** -4': { '原始值': 10 ** -4, 'NP.strip': NP.strip(10 ** -4) },
+        '0.00001 * 10000000000000000000': { '原始值': 0.00001 * 10000000000000000000, 'NP.strip': NP.strip(0.00001 * 10000000000000000000) },
+      },
+      '精确加 plus': {
         '两数相加 0.1 + 0.2': { '原始加': 0.1 + 0.2, 'NP.plus':  NP.plus(0.1, 0.2) },
         '多数相加 0.1 + 0.2 + 0.3': { '原始加': 0.1 + 0.2 + 0.3, 'NP.plus':  NP.plus(0.1, 0.2, 0.3) },
       },
-      '精确乘': {
+      '精确乘 times': {
         '两数相乘 0.1 * 0.2': { '原始乘': 0.1 * 0.2, 'NP.times':  NP.times(0.1, 0.2) },
         '两数相乘 0.000001 * 10': { '原始乘': 0.000001 * 10, 'NP.times':  NP.times(0.000001, 10) },
         '多数相乘 0.1 * 0.2 * 0.3': { '原始乘': 0.1 * 0.2 * 0.3, 'NP.times':  NP.times(0.1, 0.2, 0.3) },
         '多数相乘 5 * 2 * 9': { '原始乘': 5 * 2 * 9, 'NP.times':  NP.times(5, 2, 9) },
       },
-      '精确减': {
+      '精确减 minus': {
         '两数相减 0.3 - 0.1': { '原始减': 0.3 - 0.1, 'NP.minus': NP.minus(0.3, 0.1) },
         '多数相减 0.9 - 0.5 - 0.1': { '原始减': 0.9 - 0.5 - 0.1, 'NP.minus': NP.minus(0.9, 0.5, 0.1) }
       },

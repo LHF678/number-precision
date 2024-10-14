@@ -1,5 +1,5 @@
 /**
- * @description 解决浮动运算问题，避免小数点后产生多位数和计算精度损失，支持传入科学技术发
+ * @description 解决浮动运算问题，避免小数点后产生多位数和计算精度损失，支持传入科学技术法
  * 参考：number-precision https://github.com/nefe/number-precision.git
  * 下边对源代码+自己的一些优化逐一做了解释，加强自己对 js 中 number 精度问题的处理
  * @date 2022/06/20 新增
@@ -7,11 +7,13 @@
  * @method thousandSeparator 格式化千分位符
  */
 
+// --------------------------------------------------------------
 const _E = /[eE]-/;
+// --------------------------------------------------------------
 
 /**
- * @description 检测数字是否越界，如果越界给出提示
- * @param {number} num 输入数
+ * @description 检测数字是否越界，如果越界给出提醒
+ * @param {number}
  */
 const _checkBoundary = (num: number):void => {
   if (_boundaryCheckingState) {
@@ -22,57 +24,21 @@ const _checkBoundary = (num: number):void => {
 };
 
 /**
- * @description 迭代操作
+ * @description 迭代器
  * @param {number[]} arr
  * @param {function} operation
  * @return {number}
  */
 const _iteratorOperation = (arr: number[], operation: (...arges: number[]) => number): number => {
-
-  // 通过数组 reduce 方法迭代
   const result = arr.reduce((total: number, currentValue: number) => operation(total, currentValue));
-
   return result;
 };
 
-// -----------------------------------------------------------------------------------------------------------
-
 /**
- * @description 是否进行边界检查，默认开启
- * @param {boolean} flag true 为开启，false 为关闭，默认为 true
- */
-let _boundaryCheckingState = true;
-export const enableBoundaryChecking = (flag = true):void => {
-  _boundaryCheckingState = flag;
-};
-
-/**
- * @description 把错误的数据转正
- * @param {number} num
- * @param {number} precision 精度默认 15
- * strip(0.09999999999999998)=0.1
- * fix: 类似 10 ** -4 为 0.00009999999999999999，0.00001 * 10000000000000000000 为 100000000000000.02 strip 修正
- */
-export const strip = (num: number, precision = 15): number => {
-  return +parseFloat(num.toPrecision(precision));
-};
-
-/**
- * @description 格式化千分位符
- * @param {number} num 参数
- * @return {string} 1,324,232,423
- */
-export const thousandSeparator = (num: number): string => {
-  _checkBoundary(num);
-  const num_str = num.toString();
-  return num_str.replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
-};
-
-/**
- * @description 返回数字的位数长度，支持获取超出位数的科学计数法位数如 0.00000033浏览器表现：3.3e-7 返回 8
+ * @description 获取小数位数长度；支持获取超出位数的科学计数法位数如 0.00000033浏览器表现：3.3e-7 返回 8
  * @param {number} num
  */
-export const digitLength = (num: number): number => {
+const _digitLength = (num: number): number => {
   // 通过 .toExponential() 将数字转化为科学记数法表示，匹配正则表达式
   const exponential = num.toExponential();
   // 理解 (?:) 非捕获分组
@@ -88,38 +54,70 @@ export const digitLength = (num: number): number => {
 };
 
 /**
- * @description 处理针对小数的科学计数法
- * @param {number} num 参数
+ * @description 把小数扩大成正整数，支持科学计数法比如 0.0000001 返回 1
+ * @param {number} num 输入数
+ */
+const _float2Fixed = (num: number): number => {
+  const num_str = num.toString();
+  // 存在科学计数法
+  if (_E.test(num_str)) {
+    const len = _digitLength(num);
+    return strip(num * Math.pow(10, len));
+  }
+  return Number(num_str.replace('.', ''));
+};
+
+
+
+
+
+/**
+ * @description 是否进行边界检查，默认开启
+ * @param {boolean} flag true 为开启，false 为关闭，默认为 true
+ */
+let _boundaryCheckingState = true;
+export const enableBoundaryChecking = (flag = true):void => {
+  _boundaryCheckingState = flag;
+};
+
+/**
+ * @description 把错误的数值修正
+ * @param {number} num
+ * @param {number} precision 精度默认 15
+ * fix: 10 ** -4 = 0.00009999999999999999 修正为 0.0001
+ * fix: 0.00001 * 10000000000000000000 = 100000000000000.02 修正为 100000000000000
+ */
+export const strip = (num: number, precision = 15): number => {
+  return +parseFloat(num.toPrecision(precision));
+};
+
+/**
+ * @description 数字转千分位符
+ * @param {number} num
+ * @return {string}
+ */
+export const thousandSeparator = (num: number): string => {
+  _checkBoundary(num);
+  const num_str = num.toString();
+  return num_str.replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+};
+
+/**
+ * @description 处理小数的科学计数法
+ * @param {number} num
  * @return {string}
  */
 export const toNonExponential = (num: number): string => {
   // 获取小数后位数
-  const digits = digitLength(num);
-  // 通过 toFixed 转换
+  const digits = _digitLength(num);
   return num.toFixed(digits);
 };
 
 /**
- * @description 把小数转成整数，支持科学计数法比如（0.0000001）。如果是小数则放大成整数
- * @param {*number} num 输入数
- */
-export const float2Fixed = (num: number): number => {
-  const num_str = num.toString();
-  // 存在科学计数法
-  if (_E.test(num_str)) {
-    const len = digitLength(num);
-    return strip(num * Math.pow(10, len));
-  }
-
-  return Number(num_str.replace('.', ''));
-};
-
-/**
- * @description 精确乘法 思路与加法一至
- *  eg: 0.1 * 0.2
- *    1、转整数计算：(0.1 * 10) * (0.2 * 10) = 2
- *    2、要降多少级 Math.pow(10, 2) 2 代表数值小数点后面位数相加得到
- *    3、降级处理获得最终结果 2 / 100 = 0.02
+ * @description 精确乘法
+ * 1、相乘两数值按小数位倍数扩大成正整数
+ * 2、计算两数一共扩大了多少倍，为降位做准备
+ * 3、计算结果按扩大倍数再降位 得到最终结果
  * @param {number} nums
  * @return {number}
  */
@@ -128,18 +126,21 @@ export const times = (...nums: number[]): number => {
     return _iteratorOperation(nums, times);
   }
   const [num1, num2] = nums;
-  const num1Changed = float2Fixed(num1);
-  const num2Changed = float2Fixed(num2);
-  const baseNum = Math.pow(10, digitLength(num1) + digitLength(num2));
-  const leftValue = num1Changed * num2Changed;
-
+  const num1Changed = _float2Fixed(num1); // 按小数位倍数扩大成正整数
+  const num2Changed = _float2Fixed(num2); // 按小数位倍数扩大成正整数
+  const baseNum = Math.pow(10, _digitLength(num1) + _digitLength(num2)); // 计算两数一共扩大了多少倍，为降位做准备
+  const leftValue = num1Changed * num2Changed; // 计算结果
   _checkBoundary(leftValue);
-
-  return leftValue / baseNum;
+  return leftValue / baseNum; // 降位得到最终结果
 };
 
+
 /**
- * @description 精确加法，将所有数字升位转化为整型了再做计算，计算完毕后再将最终结果进行相应的降位处理
+ * @description 精确加法
+ * 1、相加两数值按小数位最大位数同比扩大成正整数
+ * 2、计算扩大的倍数，为升位降位做准备
+ * 3、两数值同比升位，相加计算结果
+ * 3、升级后相加的结果，降级处理获得最终结果
  * @param {number} nums
  * @return {number}
  */
@@ -148,13 +149,12 @@ export const plus = (...nums: number[]): number => {
     return _iteratorOperation(nums, plus);
   }
   const [num1, num2] = nums;
-  // 取最大的小数位
-  const maxLength = Math.max(digitLength(num1), digitLength(num2));
-  // 取得基数 -> 转化为整型
-  const baseNum = Math.pow(10, maxLength);
-  // 通过基数转化为整型计算，再降位处理
-  const result = (times(num1, baseNum) + times(num2, baseNum)) / baseNum;
-  return result;
+  const maxLength = Math.max(_digitLength(num1), _digitLength(num2)); // 取最大的小数位
+  const baseNum = Math.pow(10, maxLength); // 计算扩大倍数，为升位降位做准备
+  const num1Changed = times(num1, baseNum); // 两数值同比升位
+  const num2Changed = times(num2, baseNum); // 两数值同比升位
+  const leftValue = num1Changed + num2Changed; // 计算结果
+  return leftValue / baseNum; // 降位得到最终结果
 };
 
 /**
@@ -167,11 +167,10 @@ export const minus = (...nums: number[]): number => {
     return _iteratorOperation(nums, minus);
   }
   const [num1, num2] = nums;
-  // 取最大的小数位
-  const maxLength = Math.max(digitLength(num1), digitLength(num2));
-  // 取得基数 -> 转化为整型
-  const baseNum = Math.pow(10, maxLength);
-  // 通过基数转化为整型计算，再降位处理
-  const result = (times(num1, baseNum) - times(num2, baseNum)) / baseNum;
-  return result;
+  const maxLength = Math.max(_digitLength(num1), _digitLength(num2)); // 取最大的小数位
+  const baseNum = Math.pow(10, maxLength); // 计算扩大倍数，为升位降位做准备
+  const num1Changed = times(num1, baseNum); // 两数值同比升位
+  const num2Changed = times(num2, baseNum); // 两数值同比升位
+  const leftValue = num1Changed - num2Changed; // 计算结果
+  return leftValue / baseNum; // 降位得到最终结果
 };
