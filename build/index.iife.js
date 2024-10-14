@@ -8,6 +8,8 @@ var NP = (function (exports) {
    * @date 2022/06/20 新增
    * @method toNonExponential 处理针对小数的科学计数法
    * @method thousandSeparator 格式化千分位符
+   * @date 2024/10/14 新增
+   * @method round // 精确四舍五入
    */
   // --------------------------------------------------------------
   var _E = /[eE]-/;
@@ -174,10 +176,47 @@ var NP = (function (exports) {
       var leftValue = num1Changed - num2Changed; // 计算结果
       return leftValue / baseNum; // 降位得到最终结果
   };
+  /**
+   * @description 精确除法
+   * @param {number} nums
+   * @return {number}
+   */
+  var divide = function () {
+      var nums = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+          nums[_i] = arguments[_i];
+      }
+      if (nums.length > 2) {
+          return _iteratorOperation(nums, divide);
+      }
+      var num1 = nums[0], num2 = nums[1];
+      var num1Changed = _float2Fixed(num1); // 按小数位倍数扩大成正整数
+      var num2Changed = _float2Fixed(num2); // 按小数位倍数扩大成正整数
+      var baseNum = Math.pow(10, _digitLength(num2) - _digitLength(num1)); // 结果需要挪多少个小数位
+      var leftValue = num1Changed / num2Changed; // 计算结果
+      return times(leftValue, baseNum);
+  };
+  /**
+   * @description 精确四舍五入
+   * @param num 要四舍五入的数字
+   * @param decimal 要保留的小数位数
+   * @return {number}
+   */
+  var round = function (num, decimal) {
+      var base = Math.pow(10, decimal);
+      var n = Math.round(Math.abs(times(num, base))); // 升位
+      var j = divide(n, base); // 降位
+      if (num < 0 && j !== 0) {
+          j = times(j, -1); // 处理负数
+      }
+      return j;
+  };
 
+  exports.divide = divide;
   exports.enableBoundaryChecking = enableBoundaryChecking;
   exports.minus = minus;
   exports.plus = plus;
+  exports.round = round;
   exports.strip = strip;
   exports.thousandSeparator = thousandSeparator;
   exports.times = times;

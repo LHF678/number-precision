@@ -5,6 +5,8 @@
  * @date 2022/06/20 新增
  * @method toNonExponential 处理针对小数的科学计数法
  * @method thousandSeparator 格式化千分位符
+ * @date 2024/10/14 新增
+ * @method round // 精确四舍五入
  */
 export declare const enableBoundaryChecking: (flag?: boolean) => void;
 /**
@@ -52,3 +54,16 @@ export declare const plus: (...nums: number[]) => number;
  * @return {number}
  */
 export declare const minus: (...nums: number[]) => number;
+/**
+ * @description 精确除法
+ * @param {number} nums
+ * @return {number}
+ */
+export declare const divide: (...nums: number[]) => number;
+/**
+ * @description 精确四舍五入
+ * @param num 要四舍五入的数字
+ * @param decimal 要保留的小数位数
+ * @return {number}
+ */
+export declare const round: (num: number, decimal: number) => number;

@@ -5,6 +5,8 @@
  * @date 2022/06/20 新增
  * @method toNonExponential 处理针对小数的科学计数法
  * @method thousandSeparator 格式化千分位符
+ * @date 2024/10/14 新增
+ * @method round // 精确四舍五入
  */
 
 // --------------------------------------------------------------
@@ -173,4 +175,40 @@ export const minus = (...nums: number[]): number => {
   const num2Changed = times(num2, baseNum); // 两数值同比升位
   const leftValue = num1Changed - num2Changed; // 计算结果
   return leftValue / baseNum; // 降位得到最终结果
+};
+
+/**
+ * @description 精确除法
+ * @param {number} nums
+ * @return {number}
+ */
+export const divide = (...nums: number[]): number => {
+  if (nums.length > 2) {
+    return _iteratorOperation(nums, divide);
+  }
+  const [num1, num2] = nums;
+  const num1Changed = _float2Fixed(num1); // 按小数位倍数扩大成正整数
+  const num2Changed = _float2Fixed(num2); // 按小数位倍数扩大成正整数
+  const baseNum = Math.pow(10, _digitLength(num2) - _digitLength(num1)); // 结果需要挪多少个小数位
+  const leftValue = num1Changed / num2Changed; // 计算结果
+  return times(leftValue, baseNum);
+};
+
+
+/**
+ * @description 精确四舍五入
+ * @param num 要四舍五入的数字
+ * @param decimal 要保留的小数位数
+ * @return {number}
+ */
+export const round = (num: number, decimal: number): number => {
+  const base = Math.pow(10, decimal);
+  const n = Math.round(Math.abs(times(num, base))); // 升位
+  let j = divide(n, base); // 降位
+
+  if (num < 0 && j !== 0) {
+    j = times(j, -1); // 处理负数
+  }
+
+  return j;
 };
